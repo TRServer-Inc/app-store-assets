@@ -1,0 +1,47 @@
+name: Otomatik IPA İmzalama
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  sign:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sürüm Bilgilerini Al
+        run: |
+          echo "Yeni Release yayınlandı, IPA dosyası işleniyor..."
+
+      - name: İmzalama Aracını (zsign) Kur
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libplist-utils git curl build-essential libssl-dev
+          git clone https://github.com/zhlynn/zsign.git
+          cd zsign && g++ -O3 *.cpp -o zsign -lcrypto
+          sudo cp zsign /usr/local/bin/
+
+      - name: Release'deki IPA Dosyasını İndir
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Releases içindeki .ipa uzantılı dosyayı otomatik bulur ve indirir
+          asset_url=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/repos/${{ github.repository }}/releases/latest \
+            | grep "browser_download_url" | grep ".ipa" | cut -d '"' -f 4)
+          
+          echo "İndirilecek URL: $asset_url"
+          curl -L -o app.ipa "$asset_url"
+
+      - name: IPA Dosyasını İmzala (Self-Sign / Dummy)
+        run: |
+          # Zsign ile geçici/self-sign sertifika ile imzalama adımı
+          # (Eğer kendi özel p12/mobileprovision sertifikan varsa buraya ekleyebiliriz)
+          zsign -k cert.pem -m prov.mobileprovision app.ipa signed_app.ipa || zsign -z app.ipa
+          mv app.ipa signed_app.ipa
+
+      - name: İmzalanmış Dosyayı Release'e Geri Yükle
+        uses: softprops/action-gh-release@v1
+        with:
+          files: signed_app.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -17,7 +17,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libplist-utils git curl build-essential libssl-dev
           git clone https://github.com/zhlynn/zsign.git
-          cd zsign && g++ -O3 *.cpp -o zsign -lcrypto
+          cd zsign
+          g++ -O3 *.cpp -o zsign -lcrypto
           sudo cp zsign /usr/local/bin/
 
       - name: Release İçindeki IPA Dosyasını Bul ve İndir
@@ -34,7 +35,7 @@ jobs:
 
       - name: IPA Dosyasını İmzala
         run: |
-          # Zsign ile doğrudan ipa imzalama adımı (sertifika parametreleri eklenebilir)
+          # Zsign ile doğrudan ipa imzalama adımı
           zsign -z app.ipa
           
           # zsign çıkış dosyasını signed_app.ipa olarak standartlaştırıyoruz

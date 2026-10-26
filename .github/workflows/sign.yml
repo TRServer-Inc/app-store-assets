@@ -21,31 +21,50 @@ jobs:
           make
           sudo cp ../../bin/zsign /usr/local/bin/
 
-      - name: Release İçindeki IPA Dosyasını Bul ve İndir
+      - name: Release Bilgilerini Al ve IPA İndir
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          asset_url=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            https://api.github.com/repos/${{ github.repository }}/releases/latest \
-            | grep "browser_download_url" | grep ".ipa" | cut -d '"' -f 4)
+          # Doğrudan tetiklenen release'in tag adını alıyoruz, yoksa en sonuncuyu alıyoruz
+          target_tag="${{ github.event.release.tag_name }}"
           
+          if [ -z "$target_tag" ]; then
+            echo "Tag bulunamadı, en güncel release taranıyor..."
+            release_api="https://api.github.com/repos/${{ github.repository }}/releases/latest"
+          else
+            echo "Tetiklenen Tag: $target_tag"
+            release_api="https://api.github.com/repos/${{ github.repository }}/releases/tags/$target_tag"
+          fi
+          
+          release_info=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$release_api")
+          tag_name=$(echo "$release_info" | grep '"tag_name":' | head -n 1 | cut -d '"' -f 4)
+          
+          # Sadece .ipa uzantılı dosyayı seçiyoruz
+          asset_url=$(echo "$release_info" | grep "browser_download_url" | grep ".ipa" | cut -d '"' -f 4)
+          
+          echo "İşlem Yapılacak Tag: $tag_name"
           echo "İndirilecek IPA URL: $asset_url"
           
           if [ -z "$asset_url" ]; then
-            echo "Hata: IPA dosyası bulunamadı!"
-            exit 1
+            echo "Hata: Bu release içinde .ipa dosyası bulunamadı! (Muhtemelen Windows sürümü)"
+            exit 0
           fi
           
+          echo "RELEASE_TAG=$tag_name" >> $GITHUB_ENV
           curl -L -o app.ipa "$asset_url"
 
       - name: IPA Dosyasını İmzala
         run: |
+          if [ ! -f "app.ipa" ]; then
+            echo "IPA dosyası yok, imzalama atlanıyor."
+            exit 0
+          fi
           zsign -a -o signed_app.ipa app.ipa
 
       - name: İmzalanmış Dosyayı Release'e Geri Yükle
         uses: softprops/action-gh-release@v2
         with:
           files: signed_app.ipa
-          tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ env.RELEASE_TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

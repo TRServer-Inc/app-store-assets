@@ -12,15 +12,12 @@ jobs:
       - name: Repoyu Kopyala
         uses: actions/checkout@v4
 
-      - name: Sistem Paketlerini Güncelle ve Kur
+      - name: Zsign İndir, Derle ve Kur
         run: |
           sudo apt-get update
           sudo apt-get install -y libplist-utils git curl build-essential libssl-dev
           git clone https://github.com/zhlynn/zsign.git
-
-      - name: Zsign Derle ve Kur
-        working-directory: ./zsign
-        run: |
+          cd zsign
           g++ -O3 *.cpp -o zsign -lcrypto
           sudo cp zsign /usr/local/bin/
 

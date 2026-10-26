@@ -6,7 +6,7 @@
   "ios": {
     "version": "2026.19.0",
     "bundleId": "com.innersloth.amongus",
-    "ipaUrl": "https://github.com/TRServer-Inc/app-store-assets/releases/download/Among-Us-iOS-v1.0.0/com.innersloth.amongus-2026.19.0-Decrypted.ipa"
+    "ipaUrl": "https://github.com/TRServer-Inc/app-store-assets/releases/download/Among-Us-iOS-v1.0.0/signed_app.ipa"
   },
   "windows": {
     "version": "2026.3.8",

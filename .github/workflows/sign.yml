@@ -16,7 +16,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y git g++ pkg-config libssl-dev libplist-dev
-          git clone https://github.com
+          git clone https://github.com/zhlynn/zsign.git
           cd zsign/build/linux
           make
           # Derlenen zsign dosyası üst dizindeki bin/ klasöründe yer aldığı için yolu güncelledik:

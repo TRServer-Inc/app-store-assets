@@ -12,12 +12,15 @@ jobs:
       - name: Repoyu Kopyala
         uses: actions/checkout@v4
 
-      - name: İmzalama Aracını (zsign) Kur
+      - name: Sistem Paketlerini Güncelle ve Kur
         run: |
           sudo apt-get update
           sudo apt-get install -y libplist-utils git curl build-essential libssl-dev
           git clone https://github.com/zhlynn/zsign.git
-          cd zsign
+
+      - name: Zsign Derle ve Kur
+        working-directory: ./zsign
+        run: |
           g++ -O3 *.cpp -o zsign -lcrypto
           sudo cp zsign /usr/local/bin/
 
@@ -25,7 +28,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Sadece .ipa uzantılı dosyayı seçmek için grep süzgeci
           asset_url=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             https://api.github.com/repos/${{ github.repository }}/releases/latest \
             | grep "browser_download_url" | grep ".ipa" | cut -d '"' -f 4)
@@ -35,10 +37,8 @@ jobs:
 
       - name: IPA Dosyasını İmzala
         run: |
-          # Zsign ile doğrudan ipa imzalama adımı
           zsign -z app.ipa
           
-          # zsign çıkış dosyasını signed_app.ipa olarak standartlaştırıyoruz
           if [ -f "app.imayed.ipa" ]; then
             mv app.imayed.ipa signed_app.ipa
           elif [ -f "app.ipa" ]; then

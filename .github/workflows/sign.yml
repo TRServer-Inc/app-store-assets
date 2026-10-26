@@ -40,12 +40,12 @@ jobs:
 
       - name: IPA Dosyasını İmzala
         run: |
-          # Sertifikasız/Ad-hoc imzalama için -a parametresini ekledik ve çıktıyı belirledik
           zsign -a -o signed_app.ipa app.ipa
 
       - name: İmzalanmış Dosyayı Release'e Geri Yükle
         uses: softprops/action-gh-release@v2
         with:
           files: signed_app.ipa
+          tag_name: ${{ github.event.release.tag_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

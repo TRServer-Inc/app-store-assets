@@ -25,7 +25,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Doğrudan tetiklenen release'in tag adını alıyoruz, yoksa en sonuncuyu alıyoruz
           target_tag="${{ github.event.release.tag_name }}"
           
           if [ -z "$target_tag" ]; then
@@ -38,15 +37,13 @@ jobs:
           
           release_info=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$release_api")
           tag_name=$(echo "$release_info" | grep '"tag_name":' | head -n 1 | cut -d '"' -f 4)
-          
-          # Sadece .ipa uzantılı dosyayı seçiyoruz
           asset_url=$(echo "$release_info" | grep "browser_download_url" | grep ".ipa" | cut -d '"' -f 4)
           
           echo "İşlem Yapılacak Tag: $tag_name"
           echo "İndirilecek IPA URL: $asset_url"
           
           if [ -z "$asset_url" ]; then
-            echo "Hata: Bu release içinde .ipa dosyası bulunamadı! (Muhtemelen Windows sürümü)"
+            echo "Hata: Bu release içinde .ipa dosyası bulunamadı! (Windows sürümü olabilir)"
             exit 0
           fi
           
@@ -61,10 +58,14 @@ jobs:
           fi
           zsign -a -o signed_app.ipa app.ipa
 
-      - name: İmzalanmış Dosyayı Release'e Geri Yükle
-        uses: softprops/action-gh-release@v2
-        with:
-          files: signed_app.ipa
-          tag_name: ${{ env.RELEASE_TAG }}
+      - name: İmzalanmış Dosyayı Release'e Yükle
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -f "signed_app.ipa" ]; then
+            echo "İmzalanan dosya release'e yükleniyor: ${{ env.RELEASE_TAG }}"
+            gh release upload "${{ env.RELEASE_TAG }}" signed_app.ipa --clobber
+          else
+            echo "Yüklenecek imzalı dosya bulunamadı."
+            exit 1
+          fi

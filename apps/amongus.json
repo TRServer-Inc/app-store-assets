@@ -1,0 +1,16 @@
+{
+  "id": "among-us",
+  "name": "Among Us",
+  "description": "Uzay gemisinde katili bulma ve hayatta kalma oyunu.",
+  "iconUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSi7_jKzycbNB-CJExXK0L2VYTdTsI_qOOsNoEKbUm2Xw&s=10",
+  "ios": {
+    "version": "2026.19.0",
+    "bundleId": "com.innersloth.amongus",
+    "ipaUrl": "https://github.com/TRServer-Inc/app-store-assets/releases/download/Among-Us-iOS-v1.0.0/com.innersloth.amongus-2026.19.0-Decrypted.ipa"
+  },
+  "windows": {
+    "version": "2026.3.8",
+    "downloadUrl": "https://github.com/TRServer-Inc/app-store-assets/releases/download/Among-Us-Windows-v1.0.0/Among.Us.Windows.rar"
+  },
+  "downloads": 0
+}

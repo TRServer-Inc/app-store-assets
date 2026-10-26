@@ -15,11 +15,11 @@ jobs:
       - name: Zsign İndir, Derle ve Kur
         run: |
           sudo apt-get update
-          sudo apt-get install -y libplist-utils git curl build-essential libssl-dev
+          sudo apt-get install -y libplist-utils git curl build-essential libssl-dev zlib1g-dev
           git clone https://github.com/zhlynn/zsign.git
           cd zsign
-          # Kök dizindeki common.h dosyasını görebilmesi için -I. ekliyoruz ve kökteki cpp'leri derliyoruz
-          g++ -O3 *.cpp -o zsign -lcrypto -I.
+          # Kök dizinde Makefile olduğu için doğrudan 'make' komutu ile derliyoruz
+          make
           sudo cp zsign /usr/local/bin/
 
       - name: Release İçindeki IPA Dosyasını Bul ve İndir

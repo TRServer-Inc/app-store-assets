@@ -25,7 +25,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # API adresini ve $ işaretini düzelttik
           asset_url=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
             https://api.github.com/repos/${{ github.repository }}/releases/latest \
             | grep "browser_download_url" | grep ".ipa" | cut -d '"' -f 4)
@@ -41,13 +40,8 @@ jobs:
 
       - name: IPA Dosyasını İmzala
         run: |
-          zsign -z app.ipa
-          
-          if [ -f "app.imayed.ipa" ]; then
-            mv app.imayed.ipa signed_app.ipa
-          elif [ -f "app.ipa" ]; then
-            cp app.ipa signed_app.ipa
-          fi
+          # Sertifikasız/Ad-hoc imzalama için -a parametresini ekledik ve çıktıyı belirledik
+          zsign -a -o signed_app.ipa app.ipa
 
       - name: İmzalanmış Dosyayı Release'e Geri Yükle
         uses: softprops/action-gh-release@v2

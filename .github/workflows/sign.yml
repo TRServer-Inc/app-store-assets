@@ -18,8 +18,8 @@ jobs:
           sudo apt-get install -y libplist-utils git curl build-essential libssl-dev
           git clone https://github.com/zhlynn/zsign.git
           cd zsign
-          # zsign dosyaları src klasörünün içinde olduğu için yolu src/*.cpp yapıyoruz
-          g++ -O3 src/*.cpp -o zsign -lcrypto -Isrc
+          # Kök dizindeki common.h dosyasını görebilmesi için -I. ekliyoruz ve kökteki cpp'leri derliyoruz
+          g++ -O3 *.cpp -o zsign -lcrypto -I.
           sudo cp zsign /usr/local/bin/
 
       - name: Release İçindeki IPA Dosyasını Bul ve İndir

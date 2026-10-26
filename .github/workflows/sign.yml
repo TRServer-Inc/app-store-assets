@@ -19,23 +19,18 @@ jobs:
           git clone https://github.com/zhlynn/zsign.git
           cd zsign/build/linux
           make
-          # Derlenen zsign dosyası üst dizindeki bin/ klasöründe yer aldığı için yolu güncelledik:
           sudo cp ../../bin/zsign /usr/local/bin/
 
       - name: Release İçindeki IPA Dosyasını Bul ve İndir
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          asset_url=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-            https://github.com{{ github.repository }}/releases/latest \
-
-            | grep "browser_download_url" | grep ".ipa" | cut -d '"' -f 4)
+          asset_url=$(curl -s -H "Authorization: token $GITHUB_TOKEN" https://github.com{{ github.repository }}/releases/latest | grep "browser_download_url" | grep ".ipa" | cut -d '"' -f 4)
           echo "İndirilecek IPA URL: $asset_url"
           curl -L -o app.ipa "$asset_url"
 
       - name: IPA Dosyasını İmzala
         run: |
-          # NOT: Tam yetkili bir imzalama için -k (sertifika) ve -m (provisioning profile) parametrelerini eklemeniz gerekebilir.
           zsign -z app.ipa
           
           if [ -f "app.imayed.ipa" ]; then

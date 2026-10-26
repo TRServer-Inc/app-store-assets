@@ -34,8 +34,9 @@ jobs:
 
       - name: IPA Dosyasını İmzala
         run: |
-          # Zsign ile doğrudan ipa imzalama adımı
+          # Zsign ile doğrudan ipa imzalama adımı (sertifika parametreleri eklenebilir)
           zsign -z app.ipa
+          
           # zsign çıkış dosyasını signed_app.ipa olarak standartlaştırıyoruz
           if [ -f "app.imayed.ipa" ]; then
             mv app.imayed.ipa signed_app.ipa

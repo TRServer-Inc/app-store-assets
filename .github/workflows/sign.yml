@@ -5,6 +5,10 @@ on:
   release:
     types: [published]
 
+# Hatanın çözümü için bota yazma yetkisi veriyoruz
+permissions:
+  contents: write
+
 jobs:
   sign:
     runs-on: ubuntu-latest
@@ -44,7 +48,7 @@ jobs:
           
           if [ -z "$asset_url" ]; then
             echo "Hata: Bu release içinde .ipa dosyası bulunamadı! (Windows sürümü olabilir)"
-            exit 0
+            exit 1
           fi
           
           echo "RELEASE_TAG=$tag_name" >> $GITHUB_ENV
@@ -54,7 +58,7 @@ jobs:
         run: |
           if [ ! -f "app.ipa" ]; then
             echo "IPA dosyası yok, imzalama atlanıyor."
-            exit 0
+            exit 1
           fi
           zsign -a -o signed_app.ipa app.ipa
 

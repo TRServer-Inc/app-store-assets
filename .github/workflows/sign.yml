@@ -16,10 +16,11 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y git g++ pkg-config libssl-dev libplist-dev
-          git clone https://github.com/zhlynn/zsign.git
+          git clone https://github.com
           cd zsign/build/linux
           make
-          sudo cp zsign /usr/local/bin/
+          # Derlenen zsign dosyası üst dizindeki bin/ klasöründe yer aldığı için yolu güncelledik:
+          sudo cp ../../bin/zsign /usr/local/bin/
 
       - name: Release İçindeki IPA Dosyasını Bul ve İndir
         env:
@@ -34,8 +35,7 @@ jobs:
 
       - name: IPA Dosyasını İmzala
         run: |
-          # NOT: Gerçek bir imzalama için -k (sertifika) ve -m (provisioning profile) parametrelerini eklemeniz gerekebilir.
-          # Şu anki komut ad-hoc veya cache bazlı imzalama deneyecektir.
+          # NOT: Tam yetkili bir imzalama için -k (sertifika) ve -m (provisioning profile) parametrelerini eklemeniz gerekebilir.
           zsign -z app.ipa
           
           if [ -f "app.imayed.ipa" ]; then
